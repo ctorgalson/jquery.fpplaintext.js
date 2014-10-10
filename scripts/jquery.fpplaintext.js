@@ -18,11 +18,11 @@
     // complete enough to allow this plugin to be used with other, similar
     // markup...
     var defaults = {
-      pygmentsId: 'pygments-%%',
-      plaintextId: 'plaintext-%%',
+      pygmentsId: 'pygments-%d',
+      plaintextId: 'plaintext-%d',
       tabsNav: '<dl class="tabs" data-tab role="tablist"/>',
-      highlightTab: '<a role="tab" tabindex="0" aria-selected="true">Highlighted</a>',
-      plaintextTab: '<a role="tab" tabindex="-1" aria-selected="false">Plain text</a>',
+      highlightTab: '<a href="#%s" role="tab" tabindex="0" aria-selected="true" controls="%s">Highlighted</a>',
+      plaintextTab: '<a href="#%s" role="tab" tabindex="-1" aria-selected="false" controls="%s">Plain text</a>',
       highlightWrap: '<dd role="presentational" class="active"></div>',
       plaintextWrap: '<dd role="presentational"></div>',
       tabsContentWrap: '<div class="tabs-content"></div>'
@@ -35,33 +35,21 @@
       //
       // -- the current element
       // -- a clone of it
-      // -- the current, unique pygments and plaintext id attribute values
-      // -- the $tabsNav element ready to be inserted into the DOM
+      // -- the ccurrent, unique pygments and plaintext id attribute values
+      // -- the current hightlight and plaintext tab link elements
       var $current = $(this),
           $clone = $current.clone(),
-          pygmentsId = settings.pygmentsId.replace(/%%/, i),
-          plaintextId = settings.plaintextId.replace(/%%/, i),
-          $tabsNav = $(settings.tabsNav);
+          pygmentsId = settings.pygmentsId.replace(/%d/, i),
+          plaintextId = settings.plaintextId.replace(/%d/, i),
+          highlightTab = settings.highlightTab.replace(/%s/g, pygmentsId),
+          plaintextTab = settings.plaintextTab.replace(/%s/g, plaintextId);
       // Build the tabs nav first:
-      $tabsNav
+      $(settings.tabsNav)
         // Build and append the highlight tab:
-        .append(
-          $(settings.highlightTab).attr({
-            href: '#' + pygmentsId,
-            controls: pygmentsId
-          })
-          .wrap(settings.highlightWrap)
-          .parent()
-        )
+        .append($(settings.highlightWrap).html(highlightTab))
         // Likewise for the plaintext tab:
-        .append(
-          $(settings.plaintextTab).attr({
-            href: '#' + plaintextId,
-            controls: plaintextId
-          })
-          .wrap(settings.plaintextWrap)
-          .parent()
-        )
+        .append($(settings.plaintextWrap).html(plaintextTab))
+        // Add the whole menu to the document:
         .insertBefore($current);
       // Go to work on the current element; we need to add Foundation tabs
       // class, id, role and aria-hidden attributes:
